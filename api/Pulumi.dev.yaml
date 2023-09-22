@@ -1,2 +1,6 @@
 config:
   aws:region: us-east-1
+  meetup:api-domain: <<REPALCE-WITH-YOURS>>
+  meetup:domain: <<REPALCE-WITH-YOURS>>
+  meetup:memory: "2048"
+  meetup:sub-domain: analyzer
