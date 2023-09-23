@@ -122,9 +122,11 @@ export const cdn = new aws.cloudfront.Distribution("cdn", {
   priceClass: "PriceClass_200",
   restrictions: {
     geoRestriction: {
-      // only for SL
-      restrictionType: "whitelist",
-      locations: ["LK"],
+      // // only for SL
+      // restrictionType: "whitelist",
+      // locations: ["LK"],
+      restrictionType: "none",
+      locations: [],
     },
   },
   aliases: [webDomain],
