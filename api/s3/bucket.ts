@@ -7,12 +7,18 @@ const domain = config.require("domain");
 const subDomain = config.require("sub-domain");
 
 export const webDomain = `${subDomain}.${domain}`;
+export const appDomain = config.require("web-domain");
 
 export const bucket = new aws.s3.Bucket(`${stage}-files-bucket`, {
   acl: "private",
   corsRules: [
     {
-      allowedOrigins: [webDomain, "http://localhost:3000"],
+      allowedOrigins: [
+        `https://${webDomain}`,
+        "http://localhost:3000",
+        appDomain,
+        `https://${appDomain}`,
+      ],
       allowedHeaders: ["*"],
       allowedMethods: ["GET", "HEAD", "PUT", "POST", "DELETE"],
       exposeHeaders: [

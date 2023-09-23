@@ -2,5 +2,6 @@ config:
   aws:region: us-east-1
   meetup:api-domain: api-analyzer.lakinduhewawasam.com
   meetup:domain: lakinduhewawasam.com
+  meetup:web-domain: textract.lakinduhewawasam.com
   meetup:memory: "2048"
   meetup:sub-domain: analyzer
