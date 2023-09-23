@@ -14,10 +14,44 @@ export const bucket = new aws.s3.Bucket(`${stage}-files-bucket`, {
     {
       allowedOrigins: [webDomain, "http://localhost:3000"],
       allowedHeaders: ["*"],
-      allowedMethods: ["POST"],
-      exposeHeaders: [],
+      allowedMethods: ["GET", "HEAD", "PUT", "POST", "DELETE"],
+      exposeHeaders: [
+        "x-amz-server-side-encryption",
+        "x-amz-request-id",
+        "x-amz-id-2",
+        "ETag",
+      ],
+      maxAgeSeconds: 3000,
     },
   ],
+});
+
+const staticOriginAccessIdentity = new aws.cloudfront.OriginAccessIdentity(
+  "static-oai",
+  {
+    comment: webDomain,
+  }
+);
+
+const bucketPolicy = new aws.s3.BucketPolicy("bucket-policy", {
+  bucket: bucket.id,
+  policy: pulumi
+    .all([bucket.arn, staticOriginAccessIdentity.iamArn])
+    .apply(([bucketArn, iamArn]) =>
+      JSON.stringify({
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Effect: "Allow",
+            Principal: {
+              AWS: iamArn,
+            },
+            Action: ["s3:GetObject"],
+            Resource: `${bucketArn}/*`,
+          },
+        ],
+      })
+    ),
 });
 
 const s3OriginId = `${webDomain}-s3-origin`;
@@ -41,6 +75,7 @@ const certificate = new aws.acm.Certificate(
 
 // Validate the ACM certificate with DNS.
 const validationOption = certificate.domainValidationOptions[0];
+
 const certificateValidation = new aws.route53.Record("certificate-validation", {
   name: validationOption.resourceRecordName,
   type: validationOption.resourceRecordType,
@@ -48,13 +83,6 @@ const certificateValidation = new aws.route53.Record("certificate-validation", {
   zoneId: zone.zoneId,
   ttl: 60,
 });
-
-const staticOriginAccessIdentity = new aws.cloudfront.OriginAccessIdentity(
-  "static-oai",
-  {
-    comment: webDomain,
-  }
-);
 
 export const cdn = new aws.cloudfront.Distribution("cdn", {
   enabled: true,

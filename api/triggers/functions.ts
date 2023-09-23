@@ -26,14 +26,13 @@ export const onImageAddedToBucket = new aws.lambda.CallbackFunction(
       const promises = Records.map(async (record) => {
         const { s3: s3Record } = record;
         const { object, bucket } = s3Record;
-
         const decodedKey = decodeURIComponent(object.key.replace(/\+/g, " "));
-
+        const itemKey = decodedKey.split("/")[2];
         // key will be PK of results table
         const { Item } = await documentClient
           .get({
             TableName: resultsTable.name.get(),
-            Key: { id: decodedKey },
+            Key: { id: itemKey },
           })
           .promise();
 
@@ -58,7 +57,7 @@ export const onImageAddedToBucket = new aws.lambda.CallbackFunction(
                   Queries: questions.map((question) => ({ Text: question })),
                 },
               }),
-            ClientRequestToken: decodedKey,
+            ClientRequestToken: itemKey,
             NotificationChannel: {
               SNSTopicArn: onTextractProcessingCompleted.arn.get(),
               RoleArn: textractToSnsRole.arn.get(),
@@ -69,7 +68,7 @@ export const onImageAddedToBucket = new aws.lambda.CallbackFunction(
         await documentClient
           .update({
             TableName: resultsTable.name.get(),
-            Key: { id: decodedKey },
+            Key: { id: itemKey },
             UpdateExpression: "SET #jobId = :jobId",
             ExpressionAttributeNames: {
               "#jobId": "jobId",
@@ -98,11 +97,7 @@ export const handleTextractResponse = new aws.lambda.CallbackFunction(
 
       const promises = event.Records.map(async (record) => {
         const { body } = record;
-        const {
-          JobId,
-          Status,
-          DocumentLocation: { S3ObjectName },
-        } = JSON.parse(body).message as {
+        const message = JSON.parse(JSON.parse(body).Message) as {
           JobId: string;
           Status: string;
           DocumentLocation: {
@@ -110,6 +105,10 @@ export const handleTextractResponse = new aws.lambda.CallbackFunction(
             S3Bucket: string;
           };
         };
+
+        const { DocumentLocation, JobId, Status } = message;
+
+        const { S3ObjectName } = DocumentLocation;
 
         if (Status !== "SUCCEEDED") {
           console.log("Job Failed");
@@ -130,11 +129,11 @@ export const handleTextractResponse = new aws.lambda.CallbackFunction(
           nextToken = NextToken;
           analyzedBlocks.push(...Blocks);
         } while (nextToken !== undefined);
-
+        const itemKey = decodeURI(S3ObjectName).split("/")[2];
         await documentClient
           .update({
             TableName: resultsTable.name.get(),
-            Key: { id: S3ObjectName },
+            Key: { id: itemKey },
             UpdateExpression:
               "SET #status = :completed, #responses = :responses",
             ExpressionAttributeNames: {

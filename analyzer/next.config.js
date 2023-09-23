@@ -5,6 +5,10 @@ const nextConfig = {
     {
       source: '/api/:slug*',
       destination: 'https://api-analyzer.lakinduhewawasam.com/:slug*'
+    },
+    {
+      source: '/asset/:slug*',
+      destination: 'https://analyzer.lakinduhewawasam.com/public/analyze/:slug*'
     }
   ])
 }

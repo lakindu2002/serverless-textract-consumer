@@ -10,6 +10,7 @@ import {
 import { resultsTable } from "./dynamodb/results";
 import { cdn } from "./s3/bucket";
 import { apiDomainName } from "./dns";
+import { auth } from "./auth";
 
 bucket.onObjectCreated("onObjectCreated", onImageAddedToBucket);
 
@@ -60,3 +61,6 @@ export const resultsTableName = resultsTable.name;
 export const apiUrl = apigateway.url;
 export const webDomain = cdn.domainName;
 export const apiDomain = apiDomainName.domainName;
+export const clientId = auth.userPoolClientId;
+export const userPoolId = auth.userPoolId;
+export const identityPoolId = auth.identityPoolId;

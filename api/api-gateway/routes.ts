@@ -7,4 +7,14 @@ export const routes: awsx.classic.apigateway.Route[] = [
     method: "POST",
     path: "ai/process",
   },
+  {
+    eventHandler: functions.getAllCompletedAnalysis,
+    method: "GET",
+    path: "ai/analyzed",
+  },
+  {
+    eventHandler: functions.pollAnalysis,
+    method: "POST",
+    path: "ai/poll",
+  },
 ];
