@@ -1,5 +1,5 @@
 import * as aws from "@pulumi/aws";
-import { bucket } from "./s3/bucket";
+import { bucket, cdn } from "./s3/bucket";
 import { onTextractProcessingCompleted } from "./sns/topics";
 import { textractProcessedQueue } from "./sqs/queue";
 import { apigateway } from "./api-gateway";
@@ -8,8 +8,6 @@ import {
   handleTextractResponse,
 } from "./triggers/functions";
 import { resultsTable } from "./dynamodb/results";
-import { cdn } from "./s3/bucket";
-import { apiDomainName } from "./dns";
 import { auth } from "./auth";
 
 bucket.onObjectCreated("onObjectCreated", onImageAddedToBucket);
@@ -60,7 +58,6 @@ export const bucketArn = bucket.arn;
 export const resultsTableName = resultsTable.name;
 export const apiUrl = apigateway.url;
 export const webDomain = cdn.domainName;
-export const apiDomain = apiDomainName.domainName;
 export const clientId = auth.userPoolClientId;
 export const userPoolId = auth.userPoolId;
 export const identityPoolId = auth.identityPoolId;

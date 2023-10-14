@@ -4,11 +4,11 @@ const nextConfig = {
   rewrites: async () => ([
     {
       source: '/api/:slug*',
-      destination: 'https://api-analyzer.lakinduhewawasam.com/:slug*'
+      destination: 'https://30yfalthwf.execute-api.us-east-1.amazonaws.com/stage/:slug*'
     },
     {
       source: '/asset/:slug*',
-      destination: 'https://analyzer.lakinduhewawasam.com/public/analyze/:slug*'
+      destination: 'https://dt6yuo8uylpey.cloudfront.net/public/analyze/:slug*'
     }
   ])
 }

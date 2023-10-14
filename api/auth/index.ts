@@ -14,8 +14,8 @@ const cognitoUserPool = new aws.cognito.UserPool(`${stage}-user-pool`, {
 
 const client = new aws.cognito.UserPoolClient(`${stage}-web-userpool-client`, {
   userPoolId: cognitoUserPool.id,
-  callbackUrls: ["http://localhost:3000", `https://${s3.webDomain}`],
-  logoutUrls: ["http://localhost:3000", `https://${s3.webDomain}`],
+  callbackUrls: ["http://localhost:3000"],
+  logoutUrls: ["http://localhost:3000"],
   allowedOauthFlows: ["code"],
 });
 
