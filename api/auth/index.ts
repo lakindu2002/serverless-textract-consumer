@@ -34,31 +34,6 @@ const cognitoIdentityPool = new aws.cognito.IdentityPool(
   }
 );
 
-const auuthenticatedRole = new aws.iam.Role(`${stage}-authenticated-role`, {
-  assumeRolePolicy: pulumi.all([cognitoIdentityPool.id]).apply(([cognitoId]) =>
-    JSON.stringify({
-      Version: "2012-10-17",
-      Statement: [
-        {
-          Effect: "Allow",
-          Principal: {
-            Federated: "cognito-identity.amazonaws.com",
-          },
-          Action: ["sts:AssumeRoleWithWebIdentity", "sts:TagSession"],
-          Condition: {
-            StringEquals: {
-              "cognito-identity.amazonaws.com:aud": `${cognitoId}`,
-            },
-            "ForAnyValue:StringLike": {
-              "cognito-identity.amazonaws.com:amr": "authenticated",
-            },
-          },
-        },
-      ],
-    })
-  ),
-});
-
 const unAuthenticatedRole = new aws.iam.Role(`${stage}-unauthenticated-role`, {
   assumeRolePolicy: pulumi.all([cognitoIdentityPool.id]).apply(([cognitoId]) =>
     JSON.stringify({
@@ -129,7 +104,6 @@ const identityPoolRoleAttachment = new aws.cognito.IdentityPoolRoleAttachment(
     identityPoolId: cognitoIdentityPool.id,
     roles: {
       unauthenticated: unAuthenticatedRole.arn,
-      authenticated: auuthenticatedRole.arn,
     },
   }
 );

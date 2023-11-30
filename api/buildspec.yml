@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - curl -fsSL https://get.pulumi.com/ | sh
+      - export PATH=$PATH:$HOME/.pulumi/bin
+  build:
+    commands:
+      - echo "Updating Pulumi Stack"
+      - npm install
+      - npm run build
+      - pulumi stack select $STAGE
+      - pulumi up --yes
+
