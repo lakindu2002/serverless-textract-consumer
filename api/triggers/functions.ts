@@ -30,6 +30,7 @@ export const onImageAddedToBucket = new aws.lambda.CallbackFunction(
         ManagedPolicy.AWSXrayFullAccess,
         ManagedPolicy.CloudWatchEventsFullAccess,
         ManagedPolicy.AWSLambdaBasicExecutionRole,
+        ManagedPolicy.AmazonS3ReadOnlyAccess,
       ],
       inlinePolicies: [
         {
