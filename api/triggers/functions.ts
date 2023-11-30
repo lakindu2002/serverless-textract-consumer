@@ -4,7 +4,7 @@ import { onTextractProcessingCompleted } from "../sns/topics";
 import { textractToSnsRole } from "../iam/roles";
 import { resultsTable } from "../dynamodb/results";
 import { Result } from "../types/result";
-import { ManagedPolicies, ManagedPolicy } from "@pulumi/aws/iam";
+import { ManagedPolicy } from "@pulumi/aws/iam";
 
 const stage = pulumi.getStack();
 const config = new pulumi.Config();
@@ -132,6 +132,7 @@ export const handleTextractResponse = new aws.lambda.CallbackFunction(
         ManagedPolicy.CloudWatchEventsFullAccess,
         ManagedPolicy.AWSLambdaBasicExecutionRole,
         ManagedPolicy.AmazonS3ReadOnlyAccess,
+        ManagedPolicy.AmazonSQSFullAccess,
       ],
       inlinePolicies: [
         {
