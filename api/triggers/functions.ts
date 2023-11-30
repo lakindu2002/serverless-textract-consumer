@@ -34,7 +34,7 @@ export const onImageAddedToBucket = new aws.lambda.CallbackFunction(
       ],
       inlinePolicies: [
         {
-          name: "ssm-read-params-policy",
+          name: "inline-policies",
           policy: JSON.stringify({
             Version: "2012-10-17",
             Statement: [
@@ -120,6 +120,36 @@ export const handleTextractResponse = new aws.lambda.CallbackFunction(
   `${stage}-handle-textract-response`,
   {
     timeout: 20,
+    role: new aws.iam.Role(`${stage}-handle-textract-response-role`, {
+      assumeRolePolicy: aws.iam.assumeRolePolicyForPrincipal({
+        Service: "lambda.amazonaws.com",
+      }),
+      managedPolicyArns: [
+        ManagedPolicy.AWSXrayFullAccess,
+        ManagedPolicy.LambdaFullAccess,
+        ManagedPolicy.AmazonDynamoDBFullAccess,
+        ManagedPolicy.AWSXrayFullAccess,
+        ManagedPolicy.CloudWatchEventsFullAccess,
+        ManagedPolicy.AWSLambdaBasicExecutionRole,
+        ManagedPolicy.AmazonS3ReadOnlyAccess,
+      ],
+      inlinePolicies: [
+        {
+          name: "inline-policies",
+          policy: JSON.stringify({
+            Version: "2012-10-17",
+            Statement: [
+              {
+                Sid: "textractPolicies",
+                Effect: "Allow",
+                Action: ["textract:GetDocumentAnalysis"],
+                Resource: "*",
+              },
+            ],
+          }),
+        },
+      ],
+    }),
     memorySize,
     callback: async (event: aws.sqs.QueueEvent): Promise<void> => {
       const documentClient = new aws.sdk.DynamoDB.DocumentClient({
