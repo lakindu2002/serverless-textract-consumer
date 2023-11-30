@@ -2,6 +2,6 @@ config:
   aws:region: us-east-1
   icitr:api-domain: api-icitr.lakinduhewawasam.com
   icitr:domain: lakinduhewawasam.com
-  icitr:web-domain: icitr.lakinduhewawasam.com
+  icitr:web-domain: uom-conference.lakinduhewawasam.com
   icitr:memory: 2048
   icitr:sub-domain: icitr
