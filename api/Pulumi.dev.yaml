@@ -4,4 +4,3 @@ config:
   icitr:domain: lakinduhewawasam.com
   icitr:web-domain: uom-conference.lakinduhewawasam.com
   icitr:memory: 2048
-  icitr:sub-domain: icitr

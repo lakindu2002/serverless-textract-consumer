@@ -4,10 +4,8 @@ import * as pulumi from "@pulumi/pulumi";
 const stage = pulumi.getStack();
 const config = new pulumi.Config();
 const domain = config.require("domain");
-const subDomain = config.require("sub-domain");
 
-export const webDomain = `${subDomain}.${domain}`;
-export const appDomain = config.require("web-domain");
+export const webDomain = config.require("web-domain");
 
 export const bucket = new aws.s3.Bucket(`${stage}-files-bucket`, {
   acl: "private",
@@ -16,8 +14,9 @@ export const bucket = new aws.s3.Bucket(`${stage}-files-bucket`, {
       allowedOrigins: [
         `https://${webDomain}`,
         "http://localhost:3000",
-        appDomain,
-        `https://${appDomain}`,
+        webDomain,
+        `https://${webDomain}`,
+        `http://${webDomain}`,
       ],
       allowedHeaders: ["*"],
       allowedMethods: ["GET", "HEAD", "PUT", "POST", "DELETE"],
