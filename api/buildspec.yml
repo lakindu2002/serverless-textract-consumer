@@ -10,7 +10,6 @@ phases:
       - echo "Updating Pulumi Stack"
       - cd api
       - npm install
-      - npm run build
       - pulumi stack select $STAGE
       - pulumi up --yes
 
