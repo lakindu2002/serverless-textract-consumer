@@ -4,6 +4,7 @@ import { onTextractProcessingCompleted } from "../sns/topics";
 import { textractToSnsRole } from "../iam/roles";
 import { resultsTable } from "../dynamodb/results";
 import { Result } from "../types/result";
+import { ManagedPolicies, ManagedPolicy } from "@pulumi/aws/iam";
 
 const stage = pulumi.getStack();
 const config = new pulumi.Config();
@@ -18,6 +19,35 @@ export const onImageAddedToBucket = new aws.lambda.CallbackFunction(
   `${stage}-image-uploaded`,
   {
     memorySize,
+    role: new aws.iam.Role(`${stage}-image-uploaded-role`, {
+      assumeRolePolicy: aws.iam.assumeRolePolicyForPrincipal({
+        Service: "lambda.amazonaws.com",
+      }),
+      managedPolicyArns: [
+        ManagedPolicy.AWSXrayFullAccess,
+        ManagedPolicy.LambdaFullAccess,
+        ManagedPolicy.AmazonDynamoDBFullAccess,
+        ManagedPolicy.AWSXrayFullAccess,
+        ManagedPolicy.CloudWatchEventsFullAccess,
+        ManagedPolicy.AWSLambdaBasicExecutionRole,
+      ],
+      inlinePolicies: [
+        {
+          name: "ssm-read-params-policy",
+          policy: JSON.stringify({
+            Version: "2012-10-17",
+            Statement: [
+              {
+                Sid: "textractPolicies",
+                Effect: "Allow",
+                Action: ["textract:StartDocumentAnalysis"],
+                Resource: "*",
+              },
+            ],
+          }),
+        },
+      ],
+    }),
     callback: async (event: aws.s3.BucketEvent): Promise<void> => {
       const { Records = [] } = event;
       const documentClient = new aws.sdk.DynamoDB.DocumentClient({
